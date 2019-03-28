@@ -14,7 +14,7 @@ class User extends Model {
      * A hook to hash the user password before saving
      * it to the database.
      */
-    this.addHook('beforeSave', async (userInstance) => {
+    this.addHook('beforeSave', async userInstance => {
       if (userInstance.dirty.password) {
         userInstance.password = await Hash.make(userInstance.password)
       }
@@ -33,6 +33,18 @@ class User extends Model {
    */
   tokens () {
     return this.hasMany('App/Models/Token')
+  }
+
+  meetups () {
+    return this.hasMany('App/Models/Meetup')
+  }
+
+  subscriptions () {
+    return this.hasMany('App/Models/Subscription')
+  }
+
+  preference () {
+    return this.hasOne('App/Models/Preference')
   }
 }
 

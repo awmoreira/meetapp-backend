@@ -7,6 +7,9 @@
 /**
  * Resourceful controller for interacting with subscriptions
  */
+
+const Subscription = use('App/Models/Subscription')
+
 class SubscriptionController {
   /**
    * Show a list of all subscriptions.
@@ -17,19 +20,16 @@ class SubscriptionController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async index ({ request, response, view }) {
-  }
+  async index ({ params, request }) {
+    const { page } = request.get()
 
-  /**
-   * Render a form to be used for creating a new subscription.
-   * GET subscriptions/create
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async create ({ request, response, view }) {
+    const subscriptions = await Subscription.query()
+      .where('meetup_id', params.meetups_id)
+      .with('user')
+      .with('meetup')
+      .paginate(page)
+
+    return subscriptions
   }
 
   /**
@@ -40,7 +40,16 @@ class SubscriptionController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response }) {
+  async store ({ params, auth, response }) {
+    // verificar se já existe a inscrição
+    // utilizar transaction (possibilidade)
+
+    const subscription = await Subscription.create({
+      user_id: auth.user.id,
+      meetup_id: params.meetups_id
+    })
+
+    return subscription
   }
 
   /**
@@ -52,30 +61,10 @@ class SubscriptionController {
    * @param {Response} ctx.response
    * @param {View} ctx.view
    */
-  async show ({ params, request, response, view }) {
-  }
+  async show ({ params }) {
+    const subscription = await Subscription.findOrFail(params.id)
 
-  /**
-   * Render a form to update an existing subscription.
-   * GET subscriptions/:id/edit
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async edit ({ params, request, response, view }) {
-  }
-
-  /**
-   * Update subscription details.
-   * PUT or PATCH subscriptions/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   */
-  async update ({ params, request, response }) {
+    return subscription
   }
 
   /**
@@ -86,7 +75,10 @@ class SubscriptionController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params, request, response }) {
+  async destroy ({ params }) {
+    const subscription = await Subscription.findOrFail(params.id)
+
+    await subscription.delete()
   }
 }
 
