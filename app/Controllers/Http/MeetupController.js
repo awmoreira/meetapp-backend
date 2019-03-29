@@ -78,7 +78,7 @@ class MeetupController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async update ({ params, request }) {
+  async update ({ params, request, auth, response }) {
     const meetup = await Meetup.findOrFail(params.id)
 
     const data = request.only([
@@ -89,6 +89,12 @@ class MeetupController {
       'date_event',
       'file_id'
     ])
+
+    if (meetup.user_id !== auth.user.id) {
+      return response
+        .status(401)
+        .send({ error: { message: 'Only the creator user can update.' } })
+    }
 
     meetup.merge(data)
 

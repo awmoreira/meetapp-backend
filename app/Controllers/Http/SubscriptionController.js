@@ -8,6 +8,7 @@
  * Resourceful controller for interacting with subscriptions
  */
 
+const Database = use('Database')
 const Subscription = use('App/Models/Subscription')
 
 class SubscriptionController {
@@ -26,7 +27,7 @@ class SubscriptionController {
     const subscriptions = await Subscription.query()
       .where('meetup_id', params.meetups_id)
       .with('user')
-      .with('meetup')
+      // .with('meetup')
       .paginate(page)
 
     return subscriptions
@@ -42,15 +43,20 @@ class SubscriptionController {
    */
   async store ({ params, auth, response }) {
     // verificar se já existe a inscrição
-    // utilizar transaction (possibilidade)
-    const existSubscription = await Subscription.query()
-      .where('meetup_id', params.meetups_id)
-      .andWhere('user_id', auth.user.id)
 
-    if (existSubscription) {
-      return response
-        .status(401)
-        .send({ error: { message: 'Inscrição já realizada.' } })
+    const existSubscription = await Database.query()
+      .from('subscriptions')
+      .where({
+        user_id: auth.user.id,
+        meetup_id: params.meetups_id
+      })
+
+    console.log(existSubscription)
+
+    if (existSubscription.length > 0) {
+      return response.status(401).send({
+        error: { message: 'Inscrição já realizada.' }
+      })
     }
 
     const subscription = await Subscription.create({
