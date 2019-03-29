@@ -43,6 +43,15 @@ class SubscriptionController {
   async store ({ params, auth, response }) {
     // verificar se já existe a inscrição
     // utilizar transaction (possibilidade)
+    const existSubscription = await Subscription.query()
+      .where('meetup_id', params.meetups_id)
+      .andWhere('user_id', auth.user.id)
+
+    if (existSubscription) {
+      return response
+        .status(401)
+        .send({ error: { message: 'Inscrição já realizada.' } })
+    }
 
     const subscription = await Subscription.create({
       user_id: auth.user.id,

@@ -13,8 +13,11 @@ Route.put('passwords', 'ForgotPasswordController.update').validator(
 )
 
 Route.get('files/:id', 'FileController.show')
+
 Route.group(() => {
   Route.post('files', 'FileController.store')
+  Route.get('users', 'UserController.verifyPreferences')
+  Route.put('users', 'UserController.update').validator('UserUpdate')
 
   Route.resource('meetups', 'MeetupController')
     .apiOnly()
