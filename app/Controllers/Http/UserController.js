@@ -17,10 +17,12 @@ class UserController {
     return user
   }
 
-  async verifyPreferences ({ auth }) {
-    const preferences = await Preference.findByOrFail('user_id', auth.user.id)
+  async show ({ auth }) {
+    const user = await User.findByOrFail('id', auth.user.id)
 
-    return preferences
+    await user.load('preference')
+
+    return user
   }
 
   async update ({ request, auth }) {

@@ -16,7 +16,7 @@ Route.get('files/:id', 'FileController.show')
 
 Route.group(() => {
   Route.post('files', 'FileController.store')
-  Route.get('users', 'UserController.verifyPreferences')
+  Route.get('users', 'UserController.show')
   Route.put('users', 'UserController.update').validator('UserUpdate')
 
   Route.resource('meetups', 'MeetupController')
