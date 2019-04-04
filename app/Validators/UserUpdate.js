@@ -11,9 +11,9 @@ class User {
     const { user } = this.ctx.auth
 
     return {
-      username: `required|min:5|unique:users,username,id,${user.id}`,
-      email: `required|email|unique:users,email,id,${user.id}`,
+      // username: `required|min:5|username,id,${user.id}`,
       password: 'required|confirmed'
+      // username: `required|min:5|unique:users,username,id,${user.id}`,
     }
   }
 
