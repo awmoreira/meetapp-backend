@@ -10,6 +10,7 @@ class PreferenceSchema extends Schema {
       table
         .integer('user_id')
         .unsigned()
+        .unique()
         .references('id')
         .inTable('users')
         .onUpdate('CASCADE')

@@ -12,7 +12,7 @@ class User {
 
     return {
       // username: `required|min:5|username,id,${user.id}`,
-      password: 'required|confirmed'
+      // password: 'required|confirmed'
       // username: `required|min:5|unique:users,username,id,${user.id}`,
     }
   }

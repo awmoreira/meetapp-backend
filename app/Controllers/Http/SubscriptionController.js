@@ -27,7 +27,7 @@ class SubscriptionController {
     const subscriptions = await Subscription.query()
       .where('meetup_id', params.meetups_id)
       .with('user')
-      // .with('meetup')
+      .with('meetup')
       .paginate(page)
 
     return subscriptions
