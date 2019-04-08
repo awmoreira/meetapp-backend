@@ -5,6 +5,24 @@ const User = use('App/Models/User')
 const Preference = use('App/Models/Preference')
 
 class UserController {
+  async changePassword ({ request, auth, response }) {
+    const user = auth.current.user
+
+    const isSame =
+      !!request.input('password') === request.input('password_confirmation')
+
+    if (!isSame) {
+      return response
+        .status(401)
+        .send({ error: { message: 'Password does not match.' } })
+    }
+
+    user.password = await Hash.make(request.input('password'))
+    await user.save()
+
+    return user
+  }
+
   async store ({ request }) {
     const data = request.only(['username', 'email', 'password'])
     const preference = request.input('preference')
@@ -25,20 +43,11 @@ class UserController {
     return user
   }
 
-  async update ({ request, auth }) {
+  async update ({ request, auth, response }) {
     const data = request.only(['username', 'password'])
     const preference = request.input('preference')
 
     const user = await User.findByOrFail('id', auth.user.id)
-
-    const isSame = !!data.password === data.password_confirmation
-    // const isSame = await Hash.verify('plain-value', 'hashed-value')
-
-    // if (isSame) {
-    //   // ...
-    // }
-
-    console.log(isSame)
 
     const existPref = await Preference.query()
       .where('user_id', auth.user.id)

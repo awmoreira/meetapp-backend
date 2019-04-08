@@ -18,6 +18,7 @@ Route.group(() => {
   Route.post('files', 'FileController.store')
   Route.get('users', 'UserController.show')
   Route.put('users', 'UserController.update')
+  Route.put('users', 'UserController.changePassword')
 
   Route.resource('meetups', 'MeetupController')
     .apiOnly()
