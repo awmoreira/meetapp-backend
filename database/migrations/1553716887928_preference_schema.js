@@ -7,15 +7,6 @@ class PreferenceSchema extends Schema {
   up () {
     this.create('preferences', table => {
       table.increments()
-      table
-        .integer('user_id')
-        .unsigned()
-        .unique()
-        .references('id')
-        .inTable('users')
-        .onUpdate('CASCADE')
-        .onDelete('CASCADE')
-        .notNullable()
       table.boolean('front')
       table.boolean('back')
       table.boolean('mobile')

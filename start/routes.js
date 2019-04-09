@@ -16,6 +16,7 @@ Route.get('files/:id', 'FileController.show')
 
 Route.group(() => {
   Route.post('files', 'FileController.store')
+  Route.delete('files/:id', 'FileController.destroy')
   Route.get('users', 'UserController.show')
   Route.put('users', 'UserController.update')
   Route.put('users', 'UserController.changePassword')

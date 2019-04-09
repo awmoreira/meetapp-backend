@@ -48,6 +48,14 @@ class FileController {
         .send({ error: { message: 'Erro no upload de arquivo.' } })
     }
   }
+
+  async destroy ({ params }) {
+    const file = await File.findOrFail(params.id)
+
+    console.log(file)
+
+    await file.delete()
+  }
 }
 
 module.exports = FileController

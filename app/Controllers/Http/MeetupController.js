@@ -21,10 +21,11 @@ class MeetupController {
    * @param {View} ctx.view
    */
   async index ({ request }) {
-    const { page } = request.get() // método para buscar pelo title
+    const { page } = request.get()
 
     const meetups = await Meetup.query()
       .with('user')
+      .with('subscriptions')
       .paginate(page)
 
     return meetups
@@ -66,6 +67,7 @@ class MeetupController {
     const meetup = await Meetup.findOrFail(params.id)
 
     await meetup.load('user')
+    await meetup.load('subscriptions')
 
     return meetup
   }
@@ -114,7 +116,7 @@ class MeetupController {
   async destroy ({ params }) {
     const meetup = await Meetup.findOrFail(params.id)
 
-    meetup.delete()
+    await meetup.delete()
   }
 }
 

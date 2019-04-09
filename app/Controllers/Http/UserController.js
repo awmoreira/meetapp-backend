@@ -36,14 +36,14 @@ class UserController {
   }
 
   async show ({ auth }) {
-    const user = await User.findByOrFail('id', auth.user.id)
+    const user = await User.findOrFail(auth.user.id)
 
     await user.load('preference')
 
     return user
   }
 
-  async update ({ request, auth, response }) {
+  async update ({ request, auth }) {
     const data = request.only(['username', 'password'])
     const preference = request.input('preference')
 

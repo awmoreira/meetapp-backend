@@ -8,6 +8,15 @@ class UserSchema extends Schema {
     this.create('users', table => {
       table.increments()
       table
+        .integer('preference_id')
+        .unsigned()
+        .unique()
+        .references('id')
+        .inTable('preferences')
+        .onUpdate('CASCADE')
+        .onDelete('CASCADE')
+        .notNullable()
+      table
         .string('username', 80)
         .notNullable()
         .unique()

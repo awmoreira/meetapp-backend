@@ -42,16 +42,12 @@ class SubscriptionController {
    * @param {Response} ctx.response
    */
   async store ({ params, auth, response }) {
-    // verificar se já existe a inscrição
-
     const existSubscription = await Database.query()
       .from('subscriptions')
       .where({
         user_id: auth.user.id,
         meetup_id: params.meetups_id
       })
-
-    console.log(existSubscription)
 
     if (existSubscription.length > 0) {
       return response.status(401).send({
@@ -68,21 +64,6 @@ class SubscriptionController {
   }
 
   /**
-   * Display a single subscription.
-   * GET subscriptions/:id
-   *
-   * @param {object} ctx
-   * @param {Request} ctx.request
-   * @param {Response} ctx.response
-   * @param {View} ctx.view
-   */
-  async show ({ params }) {
-    const subscription = await Subscription.findOrFail(params.id)
-
-    return subscription
-  }
-
-  /**
    * Delete a subscription with id.
    * DELETE subscriptions/:id
    *
@@ -90,8 +71,19 @@ class SubscriptionController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async destroy ({ params }) {
-    const subscription = await Subscription.findOrFail(params.id)
+  async destroy ({ params, auth, response }) {
+    const subscription = await Database.query()
+      .from('subscriptions')
+      .where({
+        user_id: auth.user.id,
+        meetup_id: params.meetups_id
+      })
+
+    if (subscription) {
+      return response
+        .status(401)
+        .send({ error: { message: 'Ainda não foi realizada uma inscrição.' } })
+    }
 
     await subscription.delete()
   }
