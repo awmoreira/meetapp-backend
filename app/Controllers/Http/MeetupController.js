@@ -8,7 +8,10 @@
  * Resourceful controller for interacting with meetups
  */
 
+const Database = use('Database')
 const Meetup = use('App/Models/Meetup')
+const Preference = use('App/Models/Preference')
+const User = use('App/Models/User')
 
 class MeetupController {
   /**
@@ -31,6 +34,52 @@ class MeetupController {
     return meetups
   }
 
+  async subscriptions ({ request, auth }) {
+    const { page } = request.get()
+
+    const meetups = await Meetup.query()
+      .whereHas('subscriptions', builder => {
+        builder.where('user_id', auth.user.id)
+      })
+      .withCount('subscriptions')
+      .paginate(page)
+
+    return meetups
+  }
+
+  async nexts ({ request, auth }) {
+    const { page } = request.get()
+
+    const meetups = await Meetup.query()
+      .whereDoesntHave('subscriptions', builder => {
+        builder.where('user_id', auth.user.id)
+      })
+      .withCount('subscriptions')
+      .paginate(page)
+
+    return meetups
+  }
+
+  async recommended ({ request, auth }) {
+    const { page } = request.get()
+
+    const user = await User.findOrFail(auth.user.id)
+
+    await user.load('preference')
+
+    const meetups = await Meetup.query()
+      .whereDoesntHave('subscriptions', builder => {
+        builder.where('user_id', auth.user.id)
+      })
+      .has('preference', user.preference)
+      .withCount('subscriptions')
+      .paginate(page)
+
+    console.log(meetups)
+
+    return meetups
+  }
+
   /**
    * Create/save a new meetup.
    * POST meetups
@@ -39,17 +88,30 @@ class MeetupController {
    * @param {Request} ctx.request
    * @param {Response} ctx.response
    */
-  async store ({ request, response, auth }) {
+  async store ({ request, auth }) {
     const data = request.only([
       'title',
       'description',
       'locale',
-      'preference',
       'date_event',
       'file_id'
     ])
+    const preference = request.input('preference')
 
-    const meetup = await Meetup.create({ ...data, user_id: auth.user.id })
+    const trx = await Database.beginTransaction()
+
+    const pref = await Preference.create(preference, trx)
+
+    const meetup = await Meetup.create(
+      {
+        ...data,
+        user_id: auth.user.id,
+        preference_id: pref.id
+      },
+      trx
+    )
+
+    await trx.commit()
 
     return meetup
   }

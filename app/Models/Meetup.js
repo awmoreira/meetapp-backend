@@ -15,6 +15,10 @@ class Meetup extends Model {
   subscriptions () {
     return this.hasMany('App/Models/Subscription')
   }
+
+  preference () {
+    return this.belongsTo('App/Models/Preference')
+  }
 }
 
 module.exports = Meetup

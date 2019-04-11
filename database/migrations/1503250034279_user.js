@@ -15,7 +15,6 @@ class UserSchema extends Schema {
         .inTable('preferences')
         .onUpdate('CASCADE')
         .onDelete('CASCADE')
-        .notNullable()
       table
         .string('username', 80)
         .notNullable()

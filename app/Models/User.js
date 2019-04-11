@@ -44,7 +44,7 @@ class User extends Model {
   }
 
   preference () {
-    return this.hasOne('App/Models/Preference')
+    return this.belongsTo('App/Models/Preference')
   }
 }
 

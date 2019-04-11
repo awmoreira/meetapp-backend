@@ -5,7 +5,11 @@ const Model = use('Model')
 
 class Preference extends Model {
   user () {
-    return this.belongsTo('App/Models/User')
+    return this.hasOne('App/Models/User')
+  }
+
+  meetup () {
+    return this.hasOne('App/Models/Meetup')
   }
 }
 

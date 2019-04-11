@@ -33,7 +33,6 @@ class MeetupSchema extends Schema {
       table.string('title').notNullable()
       table.text('description').notNullable()
       table.string('locale').notNullable()
-      table.string('preference').notNullable()
       table.timestamp('date_event').notNullable()
       table.timestamps()
     })

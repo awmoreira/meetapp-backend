@@ -25,5 +25,9 @@ Route.group(() => {
     .apiOnly()
     .validator(new Map([[['meetups.store'], ['Meetup']]]))
 
+  Route.get('subs', 'MeetupController.subscriptions')
+  Route.get('nexts', 'MeetupController.nexts')
+  Route.get('recommended', 'MeetupController.recommended')
+
   Route.resource('meetups.subscriptions', 'SubscriptionController').apiOnly()
 }).middleware(['auth'])

@@ -12,7 +12,6 @@ class Meetup {
       title: 'required',
       description: 'required',
       locale: 'required',
-      preference: 'required',
       date_event: 'required|date'
     }
   }
