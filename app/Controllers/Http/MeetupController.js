@@ -65,17 +65,20 @@ class MeetupController {
 
     const user = await User.findOrFail(auth.user.id)
 
-    await user.load('preference')
+    const preference = await user.preference().fetch()
 
     const meetups = await Meetup.query()
       .whereDoesntHave('subscriptions', builder => {
         builder.where('user_id', auth.user.id)
       })
-      .has('preference', user.preference)
+      .whereHas('preference', builder => {
+        // builder.orWhere({ front: preference.front, back: preference.back })
+        builder
+          .where('front', preference.front)
+          .orWhere('back', preference.back)
+      })
       .withCount('subscriptions')
       .paginate(page)
-
-    console.log(meetups)
 
     return meetups
   }
