@@ -67,15 +67,25 @@ class MeetupController {
 
     const preference = await user.preference().fetch()
 
+    const pref = preference.toJSON()
+
+    delete pref.id
+    delete pref.created_at
+    delete pref.updated_at
+
+    const prefFiltered = Object.keys(pref).filter(key => pref[key] === true)
+
+    const query = prefFiltered.map(pref => `${pref} = true or `).toString()
+
+    let q = query.replace(/[,]+/g, '')
+    let queryFinal = q.substr(0, q.length - 3)
+
     const meetups = await Meetup.query()
       .whereDoesntHave('subscriptions', builder => {
         builder.where('user_id', auth.user.id)
       })
       .whereHas('preference', builder => {
-        // builder.orWhere({ front: preference.front, back: preference.back })
-        builder
-          .where('front', preference.front)
-          .orWhere('back', preference.back)
+        builder.whereRaw(`(${queryFinal})`)
       })
       .withCount('subscriptions')
       .paginate(page)
