@@ -36,8 +36,23 @@ class MeetupController {
 
   async subscriptions ({ request, auth }) {
     const { page } = request.get()
+    const { term } = request.all()
+
+    if (term) {
+      const meetups = await Meetup.query()
+        .where('title', 'ILIKE', '%' + term + '%')
+        .where('date_event', '>', new Date())
+        .whereHas('subscriptions', builder => {
+          builder.where('user_id', auth.user.id)
+        })
+        .withCount('subscriptions')
+        .paginate(page)
+
+      return meetups
+    }
 
     const meetups = await Meetup.query()
+      .where('date_event', '>', new Date())
       .whereHas('subscriptions', builder => {
         builder.where('user_id', auth.user.id)
       })
@@ -49,8 +64,23 @@ class MeetupController {
 
   async nexts ({ request, auth }) {
     const { page } = request.get()
+    const term = request.input('term')
+
+    if (term) {
+      const meetups = await Meetup.query()
+        .where('date_event', '>', new Date())
+        .where('title', 'ILIKE', '%' + term + '%')
+        .whereDoesntHave('subscriptions', builder => {
+          builder.where('user_id', auth.user.id)
+        })
+        .withCount('subscriptions')
+        .paginate(page)
+
+      return meetups
+    }
 
     const meetups = await Meetup.query()
+      .where('date_event', '>', new Date())
       .whereDoesntHave('subscriptions', builder => {
         builder.where('user_id', auth.user.id)
       })
@@ -62,6 +92,7 @@ class MeetupController {
 
   async recommended ({ request, auth }) {
     const { page } = request.get()
+    const term = request.input('term')
 
     const user = await User.findOrFail(auth.user.id)
 
@@ -80,7 +111,24 @@ class MeetupController {
     let q = query.replace(/[,]+/g, '')
     let queryFinal = q.substr(0, q.length - 3)
 
+    if (term) {
+      const meetups = await Meetup.query()
+        .where('title', 'ILIKE', '%' + term + '%')
+        .where('date_event', '>', new Date())
+        .whereDoesntHave('subscriptions', builder => {
+          builder.where('user_id', auth.user.id)
+        })
+        .whereHas('preference', builder => {
+          builder.whereRaw(`(${queryFinal})`)
+        })
+        .withCount('subscriptions')
+        .paginate(page)
+
+      return meetups
+    }
+
     const meetups = await Meetup.query()
+      .where('date_event', '>', new Date())
       .whereDoesntHave('subscriptions', builder => {
         builder.where('user_id', auth.user.id)
       })
@@ -141,7 +189,6 @@ class MeetupController {
   async show ({ params }) {
     const meetup = await Meetup.findOrFail(params.id)
 
-    await meetup.load('user')
     await meetup.load('subscriptions')
 
     return meetup
