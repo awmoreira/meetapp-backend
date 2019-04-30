@@ -12,7 +12,12 @@ class Meetup {
       title: 'required',
       description: 'required',
       locale: 'required',
-      date_event: 'required|date'
+      date_event: [
+        Validator.rule('required'),
+        Validator.rule('date'),
+        Validator.rule('dateFormat', 'YYYY-MM-DD HH:mm:ss'),
+        Validator.rule('after', new Date())
+      ],
     }
   }
 
